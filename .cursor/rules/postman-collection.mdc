@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+
+The project maintains a single Postman collection.
+
+Location:
+`docs/postman/collection.json`
+
+## Structure
+
+- Each module must have its own top-level folder inside the collection.
+- Each resource/entity within a module must have its own sub-folder.
+- All API endpoints must be added to the appropriate module folder.
+
+## Variables
+
+- Must use Postman variables for tokens and base URLs (e.g. `{{base_url}}`, `{{auth_token}}`).
+- Never hardcode token values or base URLs directly in requests.
+- The `auth_token` variable must be set by running the login/token request; document this in the collection description.
+
+## Requests
+
+- All requests must include `Accept: application/json` header.
+- Requests with a body must include `Content-Type: application/json` header.
+- Requests that support payloads (`POST`, `PUT`, `PATCH`, and `DELETE` when applicable) must include an example request body.
+- Do not add placeholder/dummy bodies for body-less requests.
+
+## Responses
+
+- Each request must include at least one saved example response (success case).
+- Error response examples (422, 403, 404) must be added where relevant.
+- Any change to a request or response shape must be reflected here.

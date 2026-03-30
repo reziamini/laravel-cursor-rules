@@ -1,0 +1,30 @@
+---
+alwaysApply: true
+---
+
+All integration tests must be written using Pest PHP.
+
+Integration tests validate the Service layer with real database interaction — not through the HTTP layer.
+
+Rules:
+
+- Tests must live in `Modules/{Module}/Tests/Integration/`.
+- Call service methods directly; do not use HTTP helpers (`postJson`, etc.).
+- Use DTOs to call service methods as the service API requires.
+- Use real database interaction; do not mock application services.
+- Use factories to create test data.
+
+- Tests must cover:
+  - Successful execution
+  - Domain/business rule failures (assert exceptions are thrown)
+  - Edge cases
+
+- Assert the returned model or scalar value.
+- Assert database state when applicable.
+
+- Use `RefreshDatabase` or `DatabaseTransactions` for isolation.
+- Each test must be independent and deterministic.
+
+- Avoid mocking unless testing external integrations (e.g. SMS, storage drivers).
+
+- Tests must follow the AAA (Arrange / Act / Assert) pattern. Use clear Arrange/Act/Assert separation (comments are mandatory).

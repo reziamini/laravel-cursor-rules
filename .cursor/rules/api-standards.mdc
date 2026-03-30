@@ -1,0 +1,82 @@
+---
+alwaysApply: true
+---
+
+## Requests
+- All endpoints must follow the REST API rules.
+- All API requests must be validated using Laravel Form Requests.
+- Each action should have its own Form Request class.
+- A shared Form Request is allowed only when the validation rules and business meaning are truly identical.
+
+## Responses
+- API responses must use Laravel Resources instead of raw arrays.
+- API responses must return JSON with a consistent structure: `success`, `code`, and `data` / `error` fields.
+- Must use correct HTTP status codes.
+
+Success:
+```php
+return response()->json([
+    'success' => true,
+    'code' => Response::HTTP_OK,
+    'data' => $resource
+], Response::HTTP_OK);
+```
+
+Resource example:
+```php
+$resource = UserResource::make($user);
+
+return response()->json([
+    'success' => true,
+    'code' => Response::HTTP_OK,
+    'data' => $resource
+], Response::HTTP_OK);
+```
+
+Paginated data:
+```php
+return response()->json([
+    'success' => true,
+    'code' => Response::HTTP_OK,
+    'data' => $paginator->items(),
+    'pagination' => [
+        'current_page' => $paginator->currentPage(),
+        'last_page' => $paginator->lastPage(),
+        'per_page' => $paginator->perPage(),
+        'total' => $paginator->total(),
+    ]
+], Response::HTTP_OK);
+```
+
+Failure:
+```php
+return response()->json([
+    'success' => false,
+    'code' => Response::HTTP_UNPROCESSABLE_ENTITY,
+    'error' => $message
+], Response::HTTP_UNPROCESSABLE_ENTITY);
+```
+
+No-content (e.g. delete):
+```php
+return response()->json([
+    'success' => true,
+    'code' => Response::HTTP_NO_CONTENT
+], Response::HTTP_NO_CONTENT);
+```
+
+## Auth
+- Use Laravel Passport for API token authentication (unless otherwise specified).
+- All protected routes must use the `auth:api` middleware.
+- Never hardcode or expose tokens.
+
+## Authorization
+- Use Laravel Policies for all model-level authorization.
+- Never write authorization logic inside Services.
+- Each new action in the system must have its own permission inside the RoleAndPermissions seeder using `firstOrCreate`.
+- Each new action route must check the user's permission via the policy before proceeding.
+
+## Pagination
+- List endpoints that may return large datasets must be paginated.
+- Default page size is 15 unless the business context requires otherwise.
+- Paginated responses must include pagination metadata in the response structure.

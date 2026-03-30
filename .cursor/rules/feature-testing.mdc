@@ -1,0 +1,39 @@
+---
+alwaysApply: true
+---
+
+All feature tests must be written using Pest PHP.
+
+Feature tests validate API endpoints through the full HTTP stack.
+
+Rules:
+
+- Each API endpoint must have comprehensive feature tests covering multiple scenarios.
+- Tests must live inside the module: `Modules/{Module}/Tests/Feature/`.
+- Use descriptive test names with the `it()` syntax.
+
+- Use Laravel test helpers (`actingAs`, `postJson`, `getJson`, etc.).
+- Always assert the HTTP status code and response structure.
+- Responses must assert the JSON structure (`success`, `code`, and `data` / `error` fields).
+
+- Use factories and factory states to create realistic test data.
+- Do not manually insert raw data into the database.
+
+- Tests must cover:
+  - Success scenarios
+  - Validation errors (422)
+  - Authorization and permission checks (403)
+  - Unauthenticated access (401)
+  - Not found scenarios (404)
+  - Business/domain rule failures
+- The above scenarios must be covered per endpoint where relevant, or explicitly covered at module level without duplication.
+
+- Assert database state changes when applicable.
+
+- Use `RefreshDatabase` for isolated test runs; prefer `DatabaseTransactions` when the suite is large.
+
+- Avoid mocking application services; only mock external integrations (SMS, payment gateways, etc.).
+
+- Each test must be independent and must not rely on the state of another test.
+
+- Tests must follow the AAA (Arrange / Act / Assert) pattern. Use clear Arrange/Act/Assert separation (comments are mandatory).

@@ -1,0 +1,74 @@
+---
+alwaysApply: true
+---
+
+All business features must be implemented as independent modules.
+
+Module structure:
+
+Modules/{ModuleName}/
+    Http/
+    Services/
+    Exceptions/
+    DTOs/
+    Policies/
+    Models/
+    Enums/
+    Contracts/
+    Events/
+    Listeners/
+    Messages/
+    Routes/
+    Database/
+        Migrations/
+        Factories/
+        Seeders/
+    Providers/
+    Tests/
+        Feature/
+        Integration/
+    Docs/
+
+Rules:
+- Create directories only when required for the module.
+- Routes and migrations must live inside the module, not the global migrations directory.
+- Each module must register its own ServiceProvider.
+- Modules must not be tightly coupled to each other.
+- Shared logic must live in `Modules/Share/`.
+- `Modules/Share/` is for cross-cutting abstractions only (base exceptions, shared contracts, response helpers, common value objects).
+- Do not move module-specific business services, policies, models, or workflows into `Modules/Share/`.
+
+## Cross-Module Communication
+
+There are two distinct communication patterns. Choose based on intent:
+
+### 1. Commands — "Do this for me" (synchronous, required)
+
+Use when the calling module needs another module to perform a specific action as part of its own flow,
+and that action must complete (e.g. attaching files, reserving inventory, creating required linked records).
+
+Rules:
+- Define a contract interface in `Modules/Share/Contracts/` (e.g. `FileAttachmentContract`, `NoteWriterContract`).
+- The implementing module fulfills the contract in its own `Services/` class (e.g. `FileAttachment`, `NoteWriter`).
+- The implementing module binds the contract to its implementation in its `ServiceProvider::register()`.
+- The calling module injects the contract — never the concrete class from another module.
+- Never import a class from another module's `Services/`, `Messages/`, or `Listeners/` directly.
+
+### 2. Events — "This happened" (fire and forget)
+
+Use when the calling module does not need to know who reacts or whether any reaction occurs
+(e.g. sending a notification when a client is approved, writing an audit log, optional note writing).
+
+Rules:
+- The originating module defines and fires the event (e.g. `ClientWasApproved`).
+- Reacting modules register their own Listeners in their own `ServiceProvider::boot()`.
+- The originating module must not import listener classes from other modules.
+- Events must be fired **after** the database transaction commits, never inside one.
+- Listeners live in `Modules/{Module}/Listeners/` of the module that reacts.
+
+### Transaction Boundary Rule
+
+- **Synchronous commands** (contracts) that modify the database belong inside the transaction.
+- **Side effects** (notifications, audit logs, optional notes) must run **after** the transaction commits, never inside it.
+- If a note is required for correctness of the primary use case, treat it as a synchronous command and execute it inside the transaction.
+  Dispatching a queued job inside an open transaction risks the worker picking it up before the commit.

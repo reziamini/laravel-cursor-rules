@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+
+- Use PHP 8+ syntax and features.
+- Follow PSR coding standards.
+- Follow SOLID, DRY, KISS principles.
+- Use PHP Enums for entity states and types and cast them in Eloquent models; never use raw strings for state conditions.
+- Controllers must remain thin and delegate logic to Services.
+- Use Laravel Form Requests for validation.
+- Create type-safe methods: avoid `mixed`, all parameters and return types must be explicit.
+- JSON, dates, booleans, and Enums must be cast in Laravel models.
+- Models must not contain business/application logic; they may contain `$fillable`, `casts()`, relationships, and reusable local scopes.
+- New env variables must be added to `.env.example`.
+
+## Services
+- Business logic must live in the Service layer.
+- Services must accept/return DTOs, Models, or scalar values — never raw arrays.
+- Services must not interact with the HTTP layer (no `Request`, `Response`, `abort()`, or `redirect()`).
+- Throw domain exceptions to signal failures; never return `null` to indicate failure.
+- Database write operations must be wrapped in transactions when multiple models are modified.
+
+## DTOs
+- Use `readonly` DTO classes instead of passing multiple primitive parameters to services.
+- Naming convention: `CreateUserDTO`, `UpdateVehicleDTO`, etc.
+- Must have a static `fromRequest(FormRequest $request)` and/or `fromArray(array $data)` factory method.
+
+## Contracts / Interfaces
+- Module-specific interfaces live in `Modules/{Module}/Contracts/`.
+- Shared interfaces live in `Modules/Share/Contracts/`.
+- Services that have multiple implementations (e.g. SMS, notifications) must be bound to an interface in the module's ServiceProvider.
+
+## Query Responsibility
+- Simple, single-condition queries belong directly in the Service.
+- Never bypass Eloquent with raw `DB::` queries unless the operation cannot be expressed through the ORM.
+
+## Exceptions
+- Each module must define its own domain exceptions in `Modules/{Module}/Exceptions/`.
+- Custom exceptions must extend the base `DomainException` in `Modules/Share/Exceptions/`.
+- Domain exceptions must map to 4xx HTTP responses; system exceptions map to 500 without a stack trace.
+- Never use `try/catch` in controllers.
+- Services may throw domain exceptions — never return `null` to indicate failure.
+- Never swallow exceptions silently (empty catch blocks are forbidden).

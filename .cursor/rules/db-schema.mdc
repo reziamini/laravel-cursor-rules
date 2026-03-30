@@ -1,0 +1,24 @@
+---
+alwaysApply: true
+---
+
+## Migrations
+- Always add foreign key constraints explicitly.
+- During active development, migration modification is allowed.
+- All soft-deletable tables must include a nullable `deleted_at` column.
+- Models backed by soft-deletable tables must use the `SoftDeletes` trait — hard deletion is forbidden unless explicitly approved.
+- Use `snake_case` for all column names.
+- Use `{table}_{column}_foreign` naming for foreign key constraints.
+- Pivot table names must be alphabetically ordered and singular (e.g. `feature_vehicle`).
+
+## Factories
+- Every model must have a Factory.
+- Factories live in `Modules/{Module}/Database/Factories/`.
+
+## Seeders
+- Module-specific seeders live in `Modules/{Module}/Database/Seeders/`.
+- The global `DatabaseSeeder` calls module seeders; module seeders must not call each other.
+
+## Documentation
+- `Modules/{Module}/Docs/schema.md` must be updated on every migration or model change.
+- Document: table name, all columns (type, nullable, default), indexes, and foreign key relations.
